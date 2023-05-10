@@ -1,0 +1,105 @@
+plugins {
+    id 'java-library'
+    id 'java'
+    id ('io.qameta.allure') version '2.11.2'
+    id "io.freefair.lombok" version "6.0.0-m2"
+}
+
+group 'rest_api'
+version '1.0-SNAPSHOT'
+
+
+allure{
+    report {
+        version.set("2.19.0")
+    }
+    adapter { // отвечает за появление папочки build/allure-results
+        aspectjWeaver.set(true) //обработка аннотации @Step
+        frameworks {
+            junit5 { //название фреймворка
+                adapterVersion.set("2.19.0") //версия интеграции фреймворка и Allure
+            }
+        }
+    }
+}
+
+
+repositories {
+    mavenCentral()
+    compileJava {
+        options.encoding = 'UTF-8'
+    }
+    compileTestJava {
+        options.encoding = 'UTF-8'
+    }
+}
+
+compileJava{
+    options.encoding='UTF-8'
+}
+
+compileTestJava{
+    options.encoding='UTF-8'
+}
+def restAssuredVersion = "5.3.0",
+        allureVersion = "2.19.0",
+        slf4jVersion = "2.0.7"
+
+dependencies {
+    testImplementation (
+            "io.rest-assured:json-schema-validator:$restAssuredVersion",
+            "org.slf4j:slf4j-simple:$slf4jVersion",
+            'com.fasterxml.jackson.core:jackson-databind:2.14.2',
+            'com.fasterxml.jackson.core:jackson-core:2.14.2',
+            'io.github.bonigarcia:webdrivermanager:5.2.1',
+            'io.qameta.allure:allure-rest-assured:2.21.0',
+            'org.junit.jupiter:junit-jupiter-api:5.6.2',
+            'io.qameta.allure:allure-selenide:2.21.0',
+            'org.junit.jupiter:junit-jupiter:5.9.2',
+            'io.qameta.allure:allure-junit5:2.18.1',
+            'com.github.javafaker:javafaker:1.0.2',
+            'io.rest-assured:rest-assured:5.1.0',
+            'org.assertj:assertj-core:3.23.1',
+            'org.aeonbits.owner:owner:1.0.4',
+            'org.slf4j:slf4j-simple:2.0.6',
+            'com.codeborne:pdf-test:1.5.0',
+            'com.codeborne:xls-test:1.4.3',
+            'com.opencsv:opencsv:5.7.1'
+   )
+}
+
+
+dependencies {
+    implementation ('io.qameta.allure:allure-rest-assured:2.21.0',
+                     'com.github.javafaker:javafaker:1.0.2',
+                     'org.projectlombok:lombok:1.18.22',
+                     'com.codeborne:selenide:6.12.3',
+                     'org.testng:testng:7.1.0'
+        )
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test) {//благодаря этой строчке передаются параметры в скрипт сборки
+    systemProperties(System.getProperties())
+    useJUnitPlatform()
+}
+test {
+    //  systemProperty "chromeoptions.prefs", "init.accept_languages=ru"
+    useJUnitPlatform()
+}
+
+task master_api_reqres(type: Test) {
+    useJUnitPlatform {
+        includeTags("api_reqres")//должно совпадать с названием @Tag в классе тестов
+    }
+}
+task master_api_allure(type: Test){
+    useJUnitPlatform{
+        includeTags("api_allure")//должно совпадать с названием @Tag в классе тестов
+    }
+}
+
+
